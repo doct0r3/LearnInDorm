@@ -36,7 +36,6 @@ public class MainHook implements IXposedHookLoadPackage {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
                     Main_context = (Context) param.args[0];
-                    Log.d("Xposed", "Context: " + Main_context);
                 }
             });
             final Class<?> jsonClass = XposedHelpers.findClass("org.json.JSONObject", lpparam.classLoader);
@@ -64,7 +63,6 @@ public class MainHook implements IXposedHookLoadPackage {
                     if (param.args.length == 2) {
                         String key = (String) param.args[0];
                         Object value = param.args[1];
-                        Log.d("Xposed", "Key: " + key + ", Value: " + value);
                         final String[] choice = {null};
                         switch (key) {
                             case "latitude":

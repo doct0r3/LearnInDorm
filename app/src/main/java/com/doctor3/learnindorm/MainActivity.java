@@ -38,8 +38,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String latitude = "";
         Toast.makeText(MainActivity.this.getApplicationContext(), "正在修改位置到" + strArr[i], Toast.LENGTH_SHORT).show();
         String str4 = strArr[i];
-        Log.d("Xposed", "STReq: " + str4.equals("A楼"));
-
         switch (str4) {
             case "A楼":
                 longitude = "108.837088";
@@ -61,13 +59,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 longitude = "108.841965";
                 latitude = "34.131153";
                 break;
-            case "信远2区":
-                longitude = "108.845561";
-                latitude = "34.131568";
-                break;
             case "信远1区":
                 longitude = "108.846347";
                 latitude = "34.130892";
+                break;
+            case "信远2区":
+                longitude = "108.845561";
+                latitude = "34.131568";
                 break;
         }
         JSONObject jsonObject = new JSONObject();
@@ -83,12 +81,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
     public void onClick(View view) {
-        final String[] strArr = {"A楼", "B楼", "C楼", "D楼","信远2区","信远1区"};
+        final String[] strArr = {"A楼", "B楼", "C楼", "D楼","信远1区","信远2区"};
         this.alert = null;
         AlertDialog.Builder builder = new AlertDialog.Builder(this.mContext);
         this.builder = builder;
