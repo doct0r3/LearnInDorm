@@ -1,13 +1,23 @@
 package com.doctor3.learnindorm;
 
 
+import android.app.Application;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
-import de.robv.android.xposed.*;
+import de.robv.android.xposed.IXposedHookLoadPackage;
+import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XCallback;
 
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,88 +25,67 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 
-import static android.content.Context.MODE_PRIVATE;
-
 public class MainHook implements IXposedHookLoadPackage {
+    Context Main_context = null;
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-
-        final Class<?> jsonClass = XposedHelpers.findClass("org.json.JSONObject", lpparam.classLoader);
-        XposedBridge.hookAllMethods(jsonClass, "put", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                String rootPath = android.os.Environment.getExternalStorageDirectory().toString();
-                String path = rootPath + "/Android/data/" + "com.chaoxing.mobile.xuezaixidian" + "/files/";
-                String filename = "latitude";
-                String filename1 = "longitude";
-                FileInputStream inputStream;
-
-                File directory = new File(path);
-                if (!directory.exists()) {
-                    path= Environment.getExternalStorageDirectory().toString() + "/Android/obb/io.virtualapp.sandvxposed64/scopedStorage/com.chaoxing.mobile.xuezaixidian/files/";
-                    directory = new File(path);
+        if (lpparam.packageName.equals("com.chaoxing.mobile.xuezaixidian")){
+            XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Main_context = (Context) param.args[0];
+                    Log.d("Xposed", "Context: " + Main_context);
                 }
-
-                File file = new File(directory, filename);
-
-                StringBuilder stringBuilder = new StringBuilder();
-                try {
-                    inputStream = new FileInputStream(file);
-                    byte[] buffer = new byte[1024];
-                    int bytesRead;
-
-                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        stringBuilder.append(new String(buffer, 0, bytesRead));
+            });
+            final Class<?> jsonClass = XposedHelpers.findClass("org.json.JSONObject", lpparam.classLoader);
+            XposedBridge.hookAllMethods(jsonClass, "put", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    String latitude =null;
+                    String longitude = null;
+                    ContentResolver resolver = Main_context.getContentResolver();
+                    Uri uri = Uri.parse("content://com.doctor3.learnindorm.lcprovider/");
+                    Cursor cursor = resolver.query(uri, null, null, null, null);
+                    if (cursor != null && cursor.moveToFirst()) {
+                        int json = cursor.getColumnIndex("json");
+                        String jsonData = cursor.getString(json);
+                        try {
+                            JSONObject jsonObject = new JSONObject(jsonData);
+                            latitude = jsonObject.getString("latitude");
+                            longitude = jsonObject.getString("longitude");
+                            Log.d("Xposed", "Got lati: " + latitude + ", long: " + longitude);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-
-                    inputStream.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                File file1 = new File(directory, filename1);
-                Log.d("Xposed", "File: "+directory );
-                StringBuilder stringBuilder1 = new StringBuilder();
-                try {
-                    inputStream = new FileInputStream(file1);
-                    byte[] buffer = new byte[1024];
-                    int bytesRead;
-
-                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        stringBuilder1.append(new String(buffer, 0, bytesRead));
-                    }
-
-                    inputStream.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                String latitude = stringBuilder.toString();
-                String longitude = stringBuilder1.toString();
-                String addr = "中国陕西省西安市长安区兴隆街道西太路西安电子科技大学(南校区)";
-                if (param.args.length == 2) {
-                    String key = (String) param.args[0];
-                    Object value = param.args[1];
-                    Log.d("Xposed", "Key: " + key + ", Value: " + value);
-
-                    final String[] choice = {null};
-                    switch (key) {
-                        case "latitude":
-                            param.args[1] = Double.valueOf(latitude);
-                            break;
-                        case "longitude":
-                            param.args[1] = Double.valueOf(longitude);
-                            break;
-                        case "address":
-                            param.args[1] = addr;
-                            break;
-                        default:
-                            break;
+                    String addr = "中国陕西省西安市长安区兴隆街道西太路西安电子科技大学(南校区)";
+                    if (param.args.length == 2) {
+                        String key = (String) param.args[0];
+                        Object value = param.args[1];
+                        Log.d("Xposed", "Key: " + key + ", Value: " + value);
+                        final String[] choice = {null};
+                        switch (key) {
+                            case "latitude":
+                                param.args[1] = Double.valueOf(latitude);
+                                break;
+                            case "longitude":
+                                param.args[1] = Double.valueOf(longitude);
+                                break;
+                            case "address":
+                                param.args[1] = addr;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
+
+
+
     }
 
 }
