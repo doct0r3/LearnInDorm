@@ -4,15 +4,16 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
+import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.util.regex.Pattern;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -31,9 +32,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void bindView() {
         ((Button) findViewById(R.id.btn1)).setOnClickListener(this);
+        ((Button) findViewById(R.id.btn_edicustom)).setOnClickListener(this);
+        
     }
 
-    public void setLocationRoot(String[] strArr, int i) {
+
+    public void setLocationCustom(){
+        EditText latitudeText = findViewById(R.id.latitudeText);
+        EditText longitudeText = findViewById(R.id.longitudeText);
+        EditText addrText = findViewById(R.id.addrText);
+        Editable latitudeTxt = longitudeText.getText();
+        Editable longitudeTxt = addrText.getText();
+        Editable addrTxt = latitudeText.getText();
+        JSONObject jsonObject = new JSONObject();
+        if (!CheckUtils.isNumeric(latitudeTxt.toString()) || !CheckUtils.isNumeric(longitudeTxt.toString())) {
+            try {
+                Toast.makeText(MainActivity.this.getApplicationContext(), "正在修改位置到" + latitudeTxt+longitudeTxt, Toast.LENGTH_SHORT).show();
+                jsonObject.put("latitude", latitudeTxt);
+                jsonObject.put("longitude", longitudeTxt);
+                jsonObject.put("address", addrTxt);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            File file = new File(mContext.getFilesDir(), "config.json");
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                writer.write(jsonObject.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(MainActivity.this.getApplicationContext(), "输入无效，请检查", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
+    public void setLocation(String[] strArr, int i) {
         String longitude = "";
         String latitude = "";
         Toast.makeText(MainActivity.this.getApplicationContext(), "正在修改位置到" + strArr[i], Toast.LENGTH_SHORT).show();
@@ -72,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             jsonObject.put("latitude", latitude);
             jsonObject.put("longitude", longitude);
+            jsonObject.put("address", "中国陕西省西安市长安区兴隆街道西太路西安电子科技大学(南校区)");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -93,12 +130,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             AlertDialog create = builder.setIcon(R.mipmap.ic_launcher).setTitle("选择目标地点:").setItems(strArr, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    setLocationRoot(strArr, i);
+                    setLocation(strArr, i);
                 }
             }).create();
             this.alert = create;
             create.show();
 
+        } else if (view.getId() == R.id.btn_edicustom) {
+            setLocationCustom();
         }
 
 

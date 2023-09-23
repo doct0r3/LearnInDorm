@@ -31,6 +31,7 @@ public class LocationConfigProvider extends ContentProvider {
         StringBuilder content = new StringBuilder();
         String latitude =null;
         String longitude = null;
+        String addr = null;
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -39,6 +40,7 @@ public class LocationConfigProvider extends ContentProvider {
             JSONObject jsonObject = new JSONObject(content.toString());
             latitude = jsonObject.getString("latitude");
             longitude = jsonObject.getString("longitude");
+            addr = jsonObject.getString("address");
         } catch (IOException | org.json.JSONException e) {
             e.printStackTrace();
         }
@@ -47,6 +49,8 @@ public class LocationConfigProvider extends ContentProvider {
         try {
             jsonObject.put("latitude", latitude);
             jsonObject.put("longitude", longitude);
+            jsonObject.put("address", addr);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

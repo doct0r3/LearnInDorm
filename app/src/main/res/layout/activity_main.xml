@@ -7,10 +7,106 @@
 		android:id="@+id/btn1"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="修改当前位置(Root)"
-		app:layout_constraintBottom_toBottomOf="parent"
+		android:layout_marginTop="92dp"
+		android:text="修改当前位置(预设)"
+		app:layout_constraintBottom_toTopOf="@+id/textView"
 		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHorizontal_bias="0.497"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent" />
+
+	<EditText
+		android:id="@+id/longitudeText"
+		android:layout_width="189dp"
+		android:layout_height="wrap_content"
+		android:autofillHints=""
+		android:hint="108.837088"
+		android:minHeight="48dp"
+		android:textColorHint="#757575"
+		app:layout_constraintBottom_toTopOf="@+id/latitudeText"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+	<TextView
+		android:id="@+id/textView"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="自定义经纬度"
+		app:layout_constraintBottom_toTopOf="@+id/longitudeText"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/btn1" />
+
+	<TextView
+		android:id="@+id/textView2"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="176dp"
+		android:text="经度"
+		app:layout_constraintEnd_toStartOf="@+id/longitudeText"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent" />
+
+	<TextView
+		android:id="@+id/textView3"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="51dp"
+		android:text="纬度"
+		app:layout_constraintEnd_toStartOf="@+id/latitudeText"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+	<EditText
+		android:id="@+id/latitudeText"
+		android:layout_width="189dp"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="24dp"
+		android:autofillHints=""
+		android:hint="34.133223"
+		android:minHeight="48dp"
+		android:textColorHint="#757575"
+		app:layout_constraintBottom_toTopOf="@+id/addrText"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/longitudeText" />
+
+	<Button
+		android:id="@+id/btn_edicustom"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="24dp"
+		android:text="修改位置(自定义)"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHorizontal_bias="0.498"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/addrText" />
+
+	<TextView
+		android:id="@+id/textView4"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="51dp"
+		android:text="地址"
+		app:layout_constraintEnd_toStartOf="@+id/addrText"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+	<EditText
+		android:id="@+id/addrText"
+		android:layout_width="189dp"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="24dp"
+		android:autofillHints=""
+		android:hint="中国陕西省西安市长安区兴隆街道西太路西安电子科技大学(南校区)"
+		android:minHeight="48dp"
+		android:singleLine="true"
+		android:textColorHint="#757575"
+		app:layout_constraintBottom_toTopOf="@+id/btn_edicustom"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/latitudeText"
+		app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
