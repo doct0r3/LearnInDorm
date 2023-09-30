@@ -15,6 +15,8 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Random;
+
 
 public class MainHook implements IXposedHookLoadPackage {
     Context Main_context = null;
@@ -52,15 +54,16 @@ public class MainHook implements IXposedHookLoadPackage {
                     }
                     String addr = "中国陕西省西安市长安区兴隆街道西太路西安电子科技大学(南校区)";
                     if (param.args.length == 2) {
+                        Random random = new Random();
                         String key = (String) param.args[0];
-                        Object value = param.args[1];
-                        final String[] choice = {null};
                         switch (key) {
                             case "latitude":
-                                param.args[1] = Double.valueOf(latitude);
+                                double randomLatitude =Double.parseDouble(latitude)+ (random.nextDouble() * 0.0001) - 0.00005;
+                                param.args[1] = randomLatitude;
                                 break;
                             case "longitude":
-                                param.args[1] = Double.valueOf(longitude);
+                                double randomLongitude =Double.parseDouble(longitude)+ (random.nextDouble() * 0.0001) - 0.00005;
+                                param.args[1] = randomLongitude;
                                 break;
                             case "address":
                                 param.args[1] = addr;

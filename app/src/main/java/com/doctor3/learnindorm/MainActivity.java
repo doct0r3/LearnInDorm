@@ -98,10 +98,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 longitude = "108.846347";
                 latitude = "34.130892";
                 break;
-            case "信远2区":
-                longitude = "108.845561";
-                latitude = "34.131568";
+            case "E楼I":
+                longitude = "108.84096";
+                latitude = "34.131023";
                 break;
+            case "E楼II":
+                longitude = "108.842164";
+                latitude = "34.130481";
+                break;
+            case "E楼III":
+                longitude = "108.843776";
+                latitude = "34.12976";
+                break;
+
         }
         JSONObject jsonObject = new JSONObject();
         try {
@@ -122,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        final String[] strArr = {"A楼", "B楼", "C楼", "D楼","信远1区","信远2区"};
+        final String[] strArr = {"A楼", "B楼", "C楼", "D楼","E楼I","E楼II","E楼III","信远1区","信远2区"};
         this.alert = null;
         AlertDialog.Builder builder = new AlertDialog.Builder(this.mContext);
         this.builder = builder;
