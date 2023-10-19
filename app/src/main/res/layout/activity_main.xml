@@ -109,4 +109,17 @@
 		app:layout_constraintTop_toBottomOf="@+id/latitudeText"
 		app:layout_constraintVertical_bias="0.0" />
 
+	<Button
+		android:id="@+id/resetDefault"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="31dp"
+		android:text="恢复默认(不修改)"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHorizontal_bias="0.498"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/btn_edicustom"
+		app:layout_constraintVertical_bias="0.048" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

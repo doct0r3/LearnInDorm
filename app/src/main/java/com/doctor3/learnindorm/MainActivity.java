@@ -33,7 +33,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void bindView() {
         ((Button) findViewById(R.id.btn1)).setOnClickListener(this);
         ((Button) findViewById(R.id.btn_edicustom)).setOnClickListener(this);
-        
+        ((Button) findViewById(R.id.resetDefault)).setOnClickListener(this);
+
     }
 
 
@@ -67,7 +68,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public void resetDefault(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("latitude", "-1");
+            jsonObject.put("longitude", "-1");
+            jsonObject.put("address", "null");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        File file = new File(mContext.getFilesDir(), "config.json");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write(jsonObject.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Toast.makeText(MainActivity.this.getApplicationContext(), "已设为不修改位置", Toast.LENGTH_SHORT).show();
 
+    }
     public void setLocation(String[] strArr, int i) {
         String longitude = "";
         String latitude = "";
@@ -131,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        final String[] strArr = {"A楼", "B楼", "C楼", "D楼","E楼I","E楼II","E楼III","信远1区","信远2区"};
+        final String[] strArr = {"A楼", "B楼左","B楼右", "C楼", "D楼","E楼I","E楼II","E楼III","信远1区","信远2区"};
         this.alert = null;
         AlertDialog.Builder builder = new AlertDialog.Builder(this.mContext);
         this.builder = builder;
@@ -147,6 +165,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         } else if (view.getId() == R.id.btn_edicustom) {
             setLocationCustom();
+        } else if (view.getId() == R.id.resetDefault) {
+            resetDefault();
         }
 
 

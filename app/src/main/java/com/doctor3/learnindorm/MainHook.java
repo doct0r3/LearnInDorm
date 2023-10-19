@@ -23,7 +23,7 @@ public class MainHook implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        if (lpparam.packageName.equals("com.chaoxing.mobile.xuezaixidian")){
+        if (lpparam.packageName.equals("com.chaoxing.mobile.xuezaixidian")) {
             XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -35,8 +35,9 @@ public class MainHook implements IXposedHookLoadPackage {
             XposedBridge.hookAllMethods(jsonClass, "put", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    String latitude =null;
+                    String latitude = null;
                     String longitude = null;
+                    String addr = "中国陕西省西安市长安区兴隆街道西太路西安电子科技大学(南校区)";
                     ContentResolver resolver = Main_context.getContentResolver();
                     Uri uri = Uri.parse("content://com.doctor3.learnindorm.lcprovider/");
                     Cursor cursor = resolver.query(uri, null, null, null, null);
@@ -47,22 +48,22 @@ public class MainHook implements IXposedHookLoadPackage {
                             JSONObject jsonObject = new JSONObject(jsonData);
                             latitude = jsonObject.getString("latitude");
                             longitude = jsonObject.getString("longitude");
+                            addr = jsonObject.getString("address");
                             Log.d("Xposed", "Got lati: " + latitude + ", long: " + longitude);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                    String addr = "中国陕西省西安市长安区兴隆街道西太路西安电子科技大学(南校区)";
-                    if (param.args.length == 2) {
+                    if (param.args.length == 2 && !latitude.equals("-1") && !longitude.equals("-1") && !addr.equals("null")) {
                         Random random = new Random();
                         String key = (String) param.args[0];
                         switch (key) {
                             case "latitude":
-                                double randomLatitude =Double.parseDouble(latitude)+ (random.nextDouble() * 0.0001) - 0.00005;
+                                double randomLatitude = Double.parseDouble(latitude) + (random.nextDouble() - 0.3) * 0.0001;
                                 param.args[1] = randomLatitude;
                                 break;
                             case "longitude":
-                                double randomLongitude =Double.parseDouble(longitude)+ (random.nextDouble() * 0.0001) - 0.00005;
+                                double randomLongitude = Double.parseDouble(longitude) + (random.nextDouble() - 0.3) * 0.0001;
                                 param.args[1] = randomLongitude;
                                 break;
                             case "address":
@@ -75,7 +76,6 @@ public class MainHook implements IXposedHookLoadPackage {
                 }
             });
         }
-
 
 
     }
