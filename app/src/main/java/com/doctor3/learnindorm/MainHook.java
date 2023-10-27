@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -15,15 +16,32 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Base64;
 import java.util.Random;
 
 
 public class MainHook implements IXposedHookLoadPackage {
     Context Main_context = null;
+    private final String ENCODE_SCRIPT = "KGZ1bmN0aW9uIHNob3dUaXAoY29udGVudCl7CiAgICAkKCIjdGlwX2NvbnRlbnQiKS5odG1sKGNvbnRlbnQpOwogICAgJCgiLnphbGVydCIpLnNob3coKTsKICAgICQoIi56YWxfYm94Iikuc2hvdygpOwp9KSgiT0sgSXRzIGEgdGVzdCIpOw==";
+    final String TAG = "WEBVIEW HOOK:";
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         if (lpparam.packageName.equals("com.chaoxing.mobile.xuezaixidian")) {
+            XposedBridge.log(" has Hooked!");
+            XposedBridge.log("inner  => " + lpparam.processName);
+            Class ActivityThread = XposedHelpers.findClass("android.app.ActivityThread",lpparam.classLoader);
+            XposedBridge.hookAllMethods(ActivityThread, "performLaunchActivity", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Object mInitialApplication = (Application) XposedHelpers.getObjectField(param.thisObject,"mInitialApplication");
+                    ClassLoader finalCL = (ClassLoader) XposedHelpers.callMethod(mInitialApplication,"getClassLoader");
+                    XposedBridge.log("found classload is => "+finalCL.toString());
+                    Class BabyMain = (Class)XposedHelpers.callMethod(finalCL,"findClass","com.chaoxing.mobile.webapp.ui.WebAppViewerFragment");
+                    hookWebview(lpparam);
+                }
+            });
             XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -78,6 +96,33 @@ public class MainHook implements IXposedHookLoadPackage {
         }
 
 
+    }
+
+    public void hookWebview(XC_LoadPackage.LoadPackageParam lpparam){
+        XposedBridge.hookAllMethods(
+                XposedHelpers.findClass("com.chaoxing.mobile.webapp.ui.WebAppViewerFragment", lpparam.classLoader),
+                "r9",
+                new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        super.afterHookedMethod(param);
+                        Log.d("Xposed", "call on onPageFinished  param【0】:  " + param.args[0].getClass().getName());
+                        Log.d("Xposed", "call on url " + param.args[1]);
+                        try {
+                            String js = "var newscript = document.createElement(\"script\");";
+                            js += "newscript.src=\"https://cdn.bootcdn.net/ajax/libs/vConsole/3.15.1/vconsole.min.js\";";
+                            js += "newscript.onload=function(){vConsole = new VConsole();};";  //xxx()代表js中某方法
+                            js += "document.body.appendChild(newscript);";
+                            XposedHelpers.callMethod(param.args[0],
+                                    "loadUrl",
+                                    "javascript:" + js);
+                        } catch (Throwable e) {
+                            Log.e(TAG, "调用loadUrl error " + e.getMessage());
+                        }
+
+                    }
+                }
+        );
     }
 
 }

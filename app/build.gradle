@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.doctor3.learnindorm"
-        minSdk 21
+        minSdk 26
         targetSdk 32
         versionCode 17
         versionName "1.0.7"
