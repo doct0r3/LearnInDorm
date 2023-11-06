@@ -116,6 +116,16 @@ public class MainHook implements IXposedHookLoadPackage {
                             XposedHelpers.callMethod(param.args[0],
                                     "loadUrl",
                                     "javascript:" + js);
+                            XposedHelpers.callMethod(param.args[0],
+                                    "setWebContentsDebuggingEnabled",
+                                    true);
+                            js = "var newscript = document.createElement(\"script\");";
+                            js += "newscript.src=\"http://127.0.0.1:8080/test.js\";";
+                            js += "newscript.onload=function(){main()};";  //xxx()代表js中某方法
+                            js += "document.body.appendChild(newscript);";
+                            XposedHelpers.callMethod(param.args[0],
+                                    "loadUrl",
+                                    "javascript:" + js);
                         } catch (Throwable e) {
                             Log.e(TAG, "调用loadUrl error " + e.getMessage());
                         }
