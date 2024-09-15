@@ -8,11 +8,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,17 +25,81 @@ import java.util.Random;
 public class MainHook implements IXposedHookLoadPackage {
     Context Main_context = null;
     final String TAG = "Xposed:";
+
+    private void hookBDLocation(XC_LoadPackage.LoadPackageParam lpparam) {
+        final Class<?> BDLoc = XposedHelpers.findClass("com.baidu.location.BDLocation", lpparam.classLoader);
+        XposedBridge.hookAllMethods(BDLoc, "getMockGnssStrategy", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                param.setResult(0);
+            }
+        });
+        XposedBridge.hookAllMethods(BDLoc, "getMockGnssProbability", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                param.setResult(-1);
+            }
+        });
+        XposedBridge.hookAllMethods(BDLoc, "getLocType", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                param.setResult(161);
+            }
+        });
+        XposedBridge.hookAllMethods(BDLoc, "getAddrStr", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                param.setResult("中国陕西省西安市长安区兴隆街道西太路西安电子科技大学(南校区)");
+            }
+        });
+
+
+    }
+    private void loadDebugHooks(XC_LoadPackage.LoadPackageParam lpparam){
+        final Class<?> a = XposedHelpers.findClass("com.chaoxing.mobile.webapp.jsprotocal.common.l0$a", lpparam.classLoader);
+        XposedBridge.hookAllMethods(a, "a", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log.i(TAG, "Method A called");
+            }
+        });
+        XposedBridge.hookAllMethods(a, "b", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log.i(TAG, "Method B called");
+            }
+        });
+
+        final Class<?> b = XposedHelpers.findClass("com.chaoxing.mobile.sign.util.LocationUtils$b", lpparam.classLoader);
+        XposedBridge.hookAllMethods(b, "onReceiveLocation", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log.i(TAG, "Received location");
+            }
+        });
+
+        final Class<?> aa = XposedHelpers.findClass("com.chaoxing.mobile.webapp.jsprotocal.common.l0$a$a", lpparam.classLoader);
+        XposedHelpers.findAndHookConstructor(aa,a,JSONObject.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                Log.i(TAG, "Hooked,"+ param.args[1]);
+            }
+        });
+
+    }
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         if (lpparam.packageName.equals("com.chaoxing.mobile.xuezaixidian")) {
-            Class ActivityThread = XposedHelpers.findClass("android.app.ActivityThread",lpparam.classLoader);
+            Class ActivityThread = XposedHelpers.findClass("android.app.ActivityThread", lpparam.classLoader);
             XposedBridge.hookAllMethods(ActivityThread, "performLaunchActivity", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    Object mInitialApplication = (Application) XposedHelpers.getObjectField(param.thisObject,"mInitialApplication");
-                    ClassLoader finalCL = (ClassLoader) XposedHelpers.callMethod(mInitialApplication,"getClassLoader");
-                    Class BabyMain = (Class)XposedHelpers.callMethod(finalCL,"findClass","com.chaoxing.mobile.webapp.ui.WebAppViewerFragment");
+                    Object mInitialApplication = (Application) XposedHelpers.getObjectField(param.thisObject, "mInitialApplication");
+                    ClassLoader finalCL = (ClassLoader) XposedHelpers.callMethod(mInitialApplication, "getClassLoader");
+                    Class BabyMain = (Class) XposedHelpers.callMethod(finalCL, "findClass", "com.chaoxing.mobile.webapp.ui.WebAppViewerFragment");
                     hookWebview(lpparam);
                 }
             });
@@ -44,6 +110,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     Main_context = (Context) param.args[0];
                 }
             });
+            hookBDLocation(lpparam);
             final Class<?> jsonClass = XposedHelpers.findClass("org.json.JSONObject", lpparam.classLoader);
             XposedBridge.hookAllMethods(jsonClass, "put", new XC_MethodHook() {
                 @Override
@@ -62,7 +129,6 @@ public class MainHook implements IXposedHookLoadPackage {
                             latitude = jsonObject.getString("latitude");
                             longitude = jsonObject.getString("longitude");
                             addr = jsonObject.getString("address");
-                            Log.d("Xposed", "Got lati: " + latitude + ", long: " + longitude);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -82,6 +148,12 @@ public class MainHook implements IXposedHookLoadPackage {
                             case "address":
                                 param.args[1] = addr;
                                 break;
+                            case "mockData":
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("strategy", 0);
+                                jsonObject.put("probability", -1);
+                                param.args[1] = jsonObject;
+                                break;
                             default:
                                 break;
                         }
@@ -93,7 +165,7 @@ public class MainHook implements IXposedHookLoadPackage {
 
     }
 
-    public void hookWebview(XC_LoadPackage.LoadPackageParam lpparam){
+    public void hookWebview(XC_LoadPackage.LoadPackageParam lpparam) {
         XposedBridge.hookAllMethods(
                 XposedHelpers.findClass("com.chaoxing.mobile.webapp.ui.WebAppViewerFragment", lpparam.classLoader),
                 "D9",

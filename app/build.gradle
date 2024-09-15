@@ -9,8 +9,8 @@ android {
         applicationId "com.doctor3.learnindorm"
         minSdk 26
         targetSdk 32
-        versionCode 19
-        versionName "1.0.9"
+        versionCode 20
+        versionName "1.1.0"
     }
 
     buildTypes {
