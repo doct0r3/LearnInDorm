@@ -216,6 +216,7 @@ public class MainHook implements IXposedHookLoadPackage {
                                     "javascript:" + js);
 
                             WebView webView = (WebView) param.args[0];
+                            replaceUserAgent(webView);
                         } catch (Throwable e) {
                             Log.e(TAG, "调用loadUrl error " + e.getMessage());
                         }
