@@ -89,6 +89,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void setOaid(){
+        EditText oaidTxt = findViewById(R.id.oaidText);
+        EditText uaTxt = findViewById(R.id.userAgentText);
+        JSONObject jsonObject = new JSONObject();
+        if (oaidTxt.getText().length() != 0 && uaTxt.getText().length() != 0) {
+            try {
+                jsonObject.put("oaid", oaidTxt.getText());
+                jsonObject.put("user-agent", uaTxt.getText());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            File file = new File(mContext.getFilesDir(), "device.json");
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                writer.write(jsonObject.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(MainActivity.this.getApplicationContext(), "已设置设备信息", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(MainActivity.this.getApplicationContext(), "UA或是OAID为空！", Toast.LENGTH_SHORT).show();
+        }
 
     }
     public void setLocation(String[] strArr, int i) {

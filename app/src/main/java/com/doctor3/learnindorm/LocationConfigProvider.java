@@ -27,30 +27,27 @@ public class LocationConfigProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
                         @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         Context context = getContext();
-        File file = new File(context.getFilesDir(), "config.json");
+        File file = new File(context.getFilesDir(), "device.json");
         StringBuilder content = new StringBuilder();
-        String latitude =null;
-        String longitude = null;
-        String addr = null;
+        String oaid =null;
+        String ua = null;
+
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 content.append(line);
             }
             JSONObject jsonObject = new JSONObject(content.toString());
-            latitude = jsonObject.getString("latitude");
-            longitude = jsonObject.getString("longitude");
-            addr = jsonObject.getString("address");
+            oaid = jsonObject.getString("oaid");
+            ua = jsonObject.getString("user-agent");
         } catch (IOException | org.json.JSONException e) {
             e.printStackTrace();
         }
         MatrixCursor cursor = new MatrixCursor(new String[]{"json"});
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("latitude", latitude);
-            jsonObject.put("longitude", longitude);
-            jsonObject.put("address", addr);
-
+            jsonObject.put("oaid", oaid);
+            jsonObject.put("user-agent", ua);
         } catch (JSONException e) {
             e.printStackTrace();
         }
