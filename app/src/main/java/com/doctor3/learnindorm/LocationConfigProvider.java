@@ -6,8 +6,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,30 +26,32 @@ public class LocationConfigProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
-                        @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+    public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
         Context context = getContext();
-        File file = new File(context.getFilesDir(), "device.json");
+        File file = new File(context.getFilesDir(), "config.json");
         StringBuilder content = new StringBuilder();
-        String oaid =null;
-        String ua = null;
-
+        String latitude = null;
+        String longitude = null;
+        String addr = null;
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 content.append(line);
             }
             JSONObject jsonObject = new JSONObject(content.toString());
-            oaid = jsonObject.getString("oaid");
-            ua = jsonObject.getString("user-agent");
+            latitude = jsonObject.getString("latitude");
+            longitude = jsonObject.getString("longitude");
+            addr = jsonObject.getString("address");
         } catch (IOException | org.json.JSONException e) {
             e.printStackTrace();
         }
         MatrixCursor cursor = new MatrixCursor(new String[]{"json"});
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("oaid", oaid);
-            jsonObject.put("user-agent", ua);
+            jsonObject.put("latitude", latitude);
+            jsonObject.put("longitude", longitude);
+            jsonObject.put("address", addr);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

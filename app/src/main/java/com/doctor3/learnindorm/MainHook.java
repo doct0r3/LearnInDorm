@@ -55,25 +55,60 @@ public class MainHook implements IXposedHookLoadPackage {
 
 
     }
-    private void loadDebugHooks(XC_LoadPackage.LoadPackageParam lpparam){
+
+    private void loadDebugHooks(XC_LoadPackage.LoadPackageParam lpparam) {
         final Class<?> a = XposedHelpers.findClass("zp.b", lpparam.classLoader);
         XposedBridge.hookAllMethods(a, "F", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Log.i(TAG, "Method F called:"+ param.args[0]);
+                Log.i(TAG, "Method F called:" + param.args[0]);
             }
         });
     }
-    private void loadOaidHooks(XC_LoadPackage.LoadPackageParam lpparam){
+
+    private void loadOaidHooks(XC_LoadPackage.LoadPackageParam lpparam) {
         final Class<?> a = XposedHelpers.findClass("zp.b", lpparam.classLoader);
         XposedBridge.hookAllMethods(a, "F", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Log.i(TAG, "Method F called:"+ param.args[0]);
-                param.args[0] = "b047d75b21023e2d";
+                ContentResolver resolver = Main_context.getContentResolver();
+                String oaid = null;
+                Uri uri = Uri.parse("content://com.doctor3.learnindorm.dcprovider/");
+                Cursor cursor = resolver.query(uri, null, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    int json = cursor.getColumnIndex("json");
+                    String jsonData = cursor.getString(json);
+                    try {
+                        JSONObject jsonObject = new JSONObject(jsonData);
+                        oaid = jsonObject.getString("oaid");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                param.args[0] = oaid;
             }
         });
     }
+
+    private void replaceUserAgent(WebView webView) {
+        WebSettings webSettings= webView.getSettings();
+        ContentResolver resolver = Main_context.getContentResolver();
+        String ua = null;
+        Uri uri = Uri.parse("content://com.doctor3.learnindorm.dcprovider/");
+        Cursor cursor = resolver.query(uri, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int json = cursor.getColumnIndex("json");
+            String jsonData = cursor.getString(json);
+            try {
+                JSONObject jsonObject = new JSONObject(jsonData);
+                ua = jsonObject.getString("user-agent");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        webSettings.setUserAgentString(ua);
+    }
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         if (lpparam.packageName.equals("com.chaoxing.mobile.xuezaixidian")) {
@@ -149,8 +184,6 @@ public class MainHook implements IXposedHookLoadPackage {
                 }
             });
         }
-
-
     }
 
     public void hookWebview(XC_LoadPackage.LoadPackageParam lpparam) {
@@ -182,9 +215,7 @@ public class MainHook implements IXposedHookLoadPackage {
                                     "loadUrl",
                                     "javascript:" + js);
 
-                            WebView webView =(WebView) param.args[0];
-                            WebSettings webSettings= webView.getSettings();
-                            webSettings.setUserAgentString("Mozilla/5.0 (Linux; Android 14; 23116PN5BC Build/UKQ1.230804.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/128.0.6613.127 Mobile Safari/537.36 (schild:3ffcb67e8a944fa71d222ef5c8eebfce) (device:23116PN5BC) Language/zh_CN com.chaoxing.mobile.xuezaixidian/ChaoXingStudy_1000149_6.3.7_android_phone_6005_249 (@Kalimdor)_3f578f76fd7246a69602c784ec615672");
+                            WebView webView = (WebView) param.args[0];
                         } catch (Throwable e) {
                             Log.e(TAG, "调用loadUrl error " + e.getMessage());
                         }
