@@ -7,7 +7,7 @@
 		android:id="@+id/btn1"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="92dp"
+		android:layout_marginTop="12dp"
 		android:text="修改当前位置(预设)"
 		app:layout_constraintBottom_toTopOf="@+id/textView"
 		app:layout_constraintEnd_toEndOf="parent"
@@ -120,6 +120,43 @@
 		app:layout_constraintHorizontal_bias="0.498"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@+id/btn_edicustom"
-		app:layout_constraintVertical_bias="0.048" />
+		app:layout_constraintVertical_bias="0.0" />
+
+	<EditText
+		android:id="@+id/oaidText"
+		android:layout_width="189dp"
+		android:layout_height="wrap_content"
+		android:autofillHints=""
+		android:hint="oaid"
+		android:minHeight="48dp"
+		android:textColorHint="#757575"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/resetDefault" />
+
+	<EditText
+		android:id="@+id/userAgentText"
+		android:layout_width="189dp"
+		android:layout_height="wrap_content"
+		android:autofillHints=""
+		android:hint="User-Agent"
+		android:minHeight="48dp"
+		android:textColorHint="#757575"
+		app:layout_constraintBottom_toTopOf="@+id/setOaid"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/oaidText"
+		app:layout_constraintVertical_bias="0.0" />
+
+	<Button
+		android:id="@+id/setOaid"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="160dp"
+		android:text="设置当前的OAID与User-Agent"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHorizontal_bias="0.498"
+		app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

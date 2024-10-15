@@ -11,6 +11,10 @@
 		android:theme="@style/Theme.LearnInDorm"
 		tools:targetApi="31">
 		<provider
+			android:name=".DeviceConfigProvider"
+			android:authorities="com.doctor3.learnindorm.dcprovider"
+			android:exported="true" />
+		<provider
 			android:name=".LocationConfigProvider"
 			android:authorities="com.doctor3.learnindorm.lcprovider"
 			android:exported="true" />

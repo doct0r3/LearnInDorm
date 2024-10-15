@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ((Button) findViewById(R.id.btn1)).setOnClickListener(this);
         ((Button) findViewById(R.id.btn_edicustom)).setOnClickListener(this);
         ((Button) findViewById(R.id.resetDefault)).setOnClickListener(this);
+        ((Button) findViewById(R.id.setOaid)).setOnClickListener(this);
 
     }
 
@@ -86,6 +87,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toast.makeText(MainActivity.this.getApplicationContext(), "已设为不修改位置", Toast.LENGTH_SHORT).show();
 
     }
+
+    public void setOaid(){
+
+    }
     public void setLocation(String[] strArr, int i) {
         String longitude = "";
         String latitude = "";
@@ -135,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             jsonObject.put("latitude", latitude);
             jsonObject.put("longitude", longitude);
             jsonObject.put("address", "中国陕西省西安市长安区兴隆街道西太路西安电子科技大学(南校区)");
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -162,11 +166,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }).create();
             this.alert = create;
             create.show();
-
         } else if (view.getId() == R.id.btn_edicustom) {
             setLocationCustom();
         } else if (view.getId() == R.id.resetDefault) {
             resetDefault();
+        }else if (view.getId() == R.id.resetDefault) {
+            setOaid();
         }
 
 

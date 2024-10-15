@@ -6,8 +6,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -18,7 +19,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Base64;
 import java.util.Random;
 
 
@@ -64,7 +64,16 @@ public class MainHook implements IXposedHookLoadPackage {
             }
         });
     }
-
+    private void loadOaidHooks(XC_LoadPackage.LoadPackageParam lpparam){
+        final Class<?> a = XposedHelpers.findClass("zp.b", lpparam.classLoader);
+        XposedBridge.hookAllMethods(a, "F", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log.i(TAG, "Method F called:"+ param.args[0]);
+                param.args[0] = "b047d75b21023e2d";
+            }
+        });
+    }
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         if (lpparam.packageName.equals("com.chaoxing.mobile.xuezaixidian")) {
@@ -78,8 +87,9 @@ public class MainHook implements IXposedHookLoadPackage {
                     ClassLoader finalCL = (ClassLoader) XposedHelpers.callMethod(mInitialApplication, "getClassLoader");
                     Class BabyMain = (Class) XposedHelpers.callMethod(finalCL, "findClass", "com.chaoxing.mobile.webapp.ui.WebAppViewerFragment");
                     hookWebview(lpparam);
-                    loadDebugHooks(lpparam);
+//                    loadDebugHooks(lpparam);
                     hookBDLocation(lpparam);
+                    loadOaidHooks(lpparam);
                 }
             });
             XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
@@ -171,6 +181,10 @@ public class MainHook implements IXposedHookLoadPackage {
                             XposedHelpers.callMethod(param.args[0],
                                     "loadUrl",
                                     "javascript:" + js);
+
+                            WebView webView =(WebView) param.args[0];
+                            WebSettings webSettings= webView.getSettings();
+                            webSettings.setUserAgentString("Mozilla/5.0 (Linux; Android 14; 23116PN5BC Build/UKQ1.230804.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/128.0.6613.127 Mobile Safari/537.36 (schild:3ffcb67e8a944fa71d222ef5c8eebfce) (device:23116PN5BC) Language/zh_CN com.chaoxing.mobile.xuezaixidian/ChaoXingStudy_1000149_6.3.7_android_phone_6005_249 (@Kalimdor)_3f578f76fd7246a69602c784ec615672");
                         } catch (Throwable e) {
                             Log.e(TAG, "调用loadUrl error " + e.getMessage());
                         }
