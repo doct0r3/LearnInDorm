@@ -85,6 +85,8 @@ public class MainHook implements IXposedHookLoadPackage {
                         e.printStackTrace();
                     }
                 }
+                Log.i(TAG, "Replace oaid:" + oaid);
+
                 param.args[0] = oaid;
             }
         });
@@ -106,6 +108,8 @@ public class MainHook implements IXposedHookLoadPackage {
                 e.printStackTrace();
             }
         }
+        Log.i(TAG, "Replace user agent:" + ua);
+
         webSettings.setUserAgentString(ua);
     }
 

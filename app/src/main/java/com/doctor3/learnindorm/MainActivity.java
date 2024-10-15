@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             setLocationCustom();
         } else if (view.getId() == R.id.resetDefault) {
             resetDefault();
-        }else if (view.getId() == R.id.resetDefault) {
+        }else if (view.getId() == R.id.setOaid) {
             setOaid();
         }
 
